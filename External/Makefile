@@ -14,12 +14,15 @@ SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 
 ifeq ($(OS),Windows_NT)
-    RM = cmd /C "cd $(BUILD_DIR) && del /Q *.o"
+    MKDIR = if not exist "$(1)" mkdir "$(1)"
 else
-    RM = rm -f $(BUILD_DIR)/*.o
+    MKDIR = mkdir -p $(1)
 endif
 
-all: $(LIB_DIR)/$(LIB_NAME)
+all: $(BUILD_DIR) $(LIB_DIR)/$(LIB_NAME)
+
+$(BUILD_DIR):
+	$(call MKDIR,$@)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE_DIR)/*.h
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -28,10 +31,6 @@ $(LIB_DIR)/$(LIB_NAME): $(OBJS)
 	$(AR) rcs $@ $(OBJS)
 
 clean:
-	ifeq ($(OS),Windows_NT)
-		cmd /C "if exist $(BUILD_DIR) del /Q $(BUILD_DIR)\*.o & if exist $(LIB_DIR)\$(LIB_NAME) del /Q $(LIB_DIR)\$(LIB_NAME)"
-	else
-		rm -rf $(BUILD_DIR)/*.o $(LIB_DIR)/$(LIB_NAME)
-	endif
+	rm -rf $(BUILD_DIR)/*.o $(LIB_DIR)/$(LIB_NAME)
 
 .PHONY: all clean

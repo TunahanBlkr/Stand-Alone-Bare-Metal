@@ -31,7 +31,22 @@ TARGET = firmware
 # Build rules
 ###############################################################################
 
-all: $(LIB_DIR)/libfreertos.a $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex
+ifeq ($(OS),Windows_NT)
+    MKDIR = if not exist "$(1)" mkdir "$(1)"
+else
+    MKDIR = mkdir -p $(1)
+endif
+
+all: $(BUILD_DIR) $(OBJ_DIR) $(LIB_DIR) $(LIB_DIR)/libfreertos.a $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex
+
+$(BUILD_DIR):
+	$(call MKDIR,$@)
+
+$(OBJ_DIR):
+	$(call MKDIR,$@)
+
+$(LIB_DIR):
+	$(call MKDIR,$@)
 
 $(LIB_DIR)/libfreertos.a:
 	$(MAKE) -C External
@@ -56,12 +71,6 @@ $(BUILD_DIR)/$(TARGET).hex: $(BUILD_DIR)/$(TARGET).elf
 ###############################################################################
 
 clean:
-ifeq ($(OS),Windows_NT)
-	del /Q $(BUILD_DIR)\*.elf
-	del /Q $(BUILD_DIR)\*.hex
-else
-	rm -f $(BUILD_DIR)/*.elf
-	rm -f $(BUILD_DIR)/*.hex
-endif
+	rm -f $(BUILD_DIR)/*.elf $(BUILD_DIR)/*.hex $(OBJ_DIR)/*.o
 
 .PHONY: all clean
