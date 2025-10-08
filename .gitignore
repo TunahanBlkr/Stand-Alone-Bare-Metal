@@ -1,0 +1,14 @@
+# Ignore lib folder
+lib/
+
+# Ignore Object Files
+*.o
+*.obj
+
+# Ignore Executable Files
+*.elf
+*.hex
+
+# Ignore IDE folder or file
+.vscode/
+*.code-workspace
