@@ -71,22 +71,6 @@ extern "C" {
 
 #define CPU_XTAL_CLK_HZ                24000000UL          /* Value of the external crystal or oscillator clock frequency in Hz */
 
-#define CPU_CLK1_HZ                    0UL                 /* Value of the CLK1 (select the CLK1_N/CLK1_P as source) frequency in Hz */
-                                                           /* If CLOCK1_P,CLOCK1_N is choose as the pll bypass clock source, please implement the CLKPN_FREQ define, otherwise 0 will be returned. */
-
-#define DEFAULT_SYSTEM_CLOCK           528000000UL         /* Default System clock value */
-
-
-/**
- * @brief System clock frequency (core clock)
- *
- * The system clock frequency supplied to the SysTick timer and the processor
- * core clock. This variable can be used by the user application to setup the
- * SysTick timer or configure other parameters. It may also be used by debugger to
- * query the frequency of the debug timer or configure the trace clock speed
- * SystemCoreClock is initialized with a correct predefined value.
- */
-extern uint32_t SystemCoreClock;
 
 /**
  * @brief Setup the microcontroller system.
@@ -96,15 +80,6 @@ extern uint32_t SystemCoreClock;
  * the variable SystemCoreClock. SystemInit is called from startup_device file.
  */
 void SystemInit (void);
-
-/**
- * @brief Updates the SystemCoreClock variable.
- *
- * It must be called whenever the core clock is changed during program
- * execution. SystemCoreClockUpdate() evaluates the clock register settings and calculates
- * the current core clock.
- */
-void SystemCoreClockUpdate (void);
 
 /**
  * @brief SystemInit function hook.
