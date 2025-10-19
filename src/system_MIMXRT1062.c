@@ -1,67 +1,5 @@
-/*
-** ###################################################################
-**     Processors:          MIMXRT1062CVJ5A
-**                          MIMXRT1062CVL5A
-**                          MIMXRT1062DVJ6A
-**                          MIMXRT1062DVL6A
-**
-**     Compilers:           Freescale C/C++ for Embedded ARM
-**                          GNU C Compiler
-**                          IAR ANSI C/C++ Compiler for ARM
-**                          Keil ARM C/C++ Compiler
-**                          MCUXpresso Compiler
-**
-**     Reference manual:    IMXRT1060RM Rev.1, 12/2018 | IMXRT1060SRM Rev.3
-**     Version:             rev. 1.2, 2019-04-29
-**     Build:               b201012
-**
-**     Abstract:
-**         Provides a system configuration function and a global variable that
-**         contains the system frequency. It configures the device and initializes
-**         the oscillator (PLL) that is part of the microcontroller device.
-**
-**     Copyright 2016 Freescale Semiconductor, Inc.
-**     Copyright 2016-2020 NXP
-**     All rights reserved.
-**
-**     SPDX-License-Identifier: BSD-3-Clause
-**
-**     http:                 www.nxp.com
-**     mail:                 support@nxp.com
-**
-**     Revisions:
-**     - rev. 0.1 (2017-01-10)
-**         Initial version.
-**     - rev. 1.0 (2018-11-16)
-**         Update header files to align with IMXRT1060RM Rev.0.
-**     - rev. 1.1 (2018-11-27)
-**         Update header files to align with IMXRT1060RM Rev.1.
-**     - rev. 1.2 (2019-04-29)
-**         Add SET/CLR/TOG register group to register CTRL, STAT, CHANNELCTRL, CH0STAT, CH0OPTS, CH1STAT, CH1OPTS, CH2STAT, CH2OPTS, CH3STAT, CH3OPTS of DCP module.
-**
-** ###################################################################
-*/
-
-/*!
- * @file MIMXRT1062
- * @version 1.2
- * @date 2019-04-29
- * @brief Device specific configuration file for MIMXRT1062 (implementation file)
- *
- * Provides a system configuration function and a global variable that contains
- * the system frequency. It configures the device and initializes the oscillator
- * (PLL) that is part of the microcontroller device.
- */
-
 #include <stdint.h>
 #include "MIMXRT1062.h"
-
-
-
-
-/* ----------------------------------------------------------------------------
-   -- SystemInit()
-   ---------------------------------------------------------------------------- */
 
 void SystemInit (void) {
 #if ((__FPU_PRESENT == 1) && (__FPU_USED == 1))
@@ -113,11 +51,13 @@ void SystemInit (void) {
 /* Enable instruction and data caches */
 #if defined(__ICACHE_PRESENT) && __ICACHE_PRESENT
     if (SCB_CCR_IC_Msk != (SCB_CCR_IC_Msk & SCB->CCR)) {
+        SCB_InvalidateICache();
         SCB_EnableICache();
     }
 #endif
 #if defined(__DCACHE_PRESENT) && __DCACHE_PRESENT
     if (SCB_CCR_DC_Msk != (SCB_CCR_DC_Msk & SCB->CCR)) {
+        SCB_InvalidateDCache();
         SCB_EnableDCache();
     }
 #endif
@@ -130,5 +70,72 @@ void SystemInit (void) {
    ---------------------------------------------------------------------------- */
 
 __attribute__ ((weak)) void SystemInitHook (void) {
-  /* Void implementation of the weak function. */
+
+    // ITCM and DTCM enable
+    IOMUXC_GPR->GPR16 |= IOMUXC_GPR_GPR16_INIT_ITCM_EN(1) | IOMUXC_GPR_GPR16_INIT_DTCM_EN(1);
+
+    // Fuse konfigurasyonunu kullan
+    IOMUXC_GPR->GPR16 &= ~IOMUXC_GPR_GPR16_FLEXRAM_BANK_CFG_SEL_MASK;
+    IOMUXC_GPR->GPR16 |= IOMUXC_GPR_GPR16_FLEXRAM_BANK_CFG_SEL(0);
+
+    CCM_ANALOG->PLL_ARM |= CCM_ANALOG_PLL_ARM_BYPASS_MASK; // PLL bypass enable
+    
+    CCM_ANALOG->PLL_ARM |= CCM_ANALOG_PLL_ARM_POWERDOWN_MASK; // PLL'i Kapat
+
+    CCM_ANALOG->PLL_ARM &= ~CCM_ANALOG_PLL_ARM_DIV_SELECT_MASK;
+    CCM_ANALOG->PLL_ARM |= CCM_ANALOG_PLL_ARM_DIV_SELECT(22); // Carpan Degeri Ayari ( 24MHz * 22 = 528MHz )
+
+    CCM->CACRR = 0U; // Saat Bolucu Degeri Ayari
+
+    CCM_ANALOG->PLL_ARM &= ~CCM_ANALOG_PLL_ARM_POWERDOWN_MASK; // PLL'e Guc Ver
+
+    CCM_ANALOG->PLL_ARM &= ~CCM_ANALOG_PLL_ARM_ENABLE_MASK; // Ne olur ne olmaz diye once biti temizle
+    CCM_ANALOG->PLL_ARM |= CCM_ANALOG_PLL_ARM_ENABLE_MASK; // PLL'i Aktive Et
+
+    //PLL Kilitlenene Kadar Bekle
+    volatile uint32_t timeout1 = 0x00FFFFFFU;
+    while (!(CCM_ANALOG->PLL_ARM & CCM_ANALOG_PLL_ARM_LOCK_MASK))
+    {
+        if(--timeout1 == 0) break;
+    }
+
+    if (CCM_ANALOG->PLL_ARM & CCM_ANALOG_PLL_ARM_LOCK_MASK) {
+        CCM_ANALOG->PLL_ARM &= ~CCM_ANALOG_PLL_ARM_BYPASS_MASK; // PLL bypass disable
+    } else {
+        // PLL Lock Fail
+    }
+
+    // AHB clock = ARM / 4 (132 MHz)
+    CCM->CBCDR &= ~CCM_CBCDR_AHB_PODF_MASK;
+    CCM->CBCDR |= CCM_CBCDR_AHB_PODF(3); // bolucu = 4
+    while(CCM->CDHIPR & CCM_CDHIPR_AHB_PODF_BUSY_MASK);
+
+    // IPG clock = AHB / 2 (66 MHz)
+    CCM->CBCDR &= ~CCM_CBCDR_IPG_PODF_MASK;
+    CCM->CBCDR |= CCM_CBCDR_IPG_PODF(1); // bolucu = 2
+    while(CCM->CDHIPR & CCM_CDHIPR_AHB_PODF_BUSY_MASK); // IPG_PODF degisimi AHB handshake ile yapilir; ayri IPG_BUSY biti yok
+
+    CCM->CBCMR &= ~CCM_CBCMR_PRE_PERIPH_CLK_SEL_MASK;
+    CCM->CBCMR |=  CCM_CBCMR_PRE_PERIPH_CLK_SEL(3);  // 3 = PLL1
+    (void)CCM->CBCMR;
+
+    CCM->CBCDR &= ~CCM_CBCDR_PERIPH_CLK_SEL_MASK;
+    CCM->CBCDR |= CCM_CBCDR_PERIPH_CLK_SEL(0); // PLL1 secildi
+    while(CCM->CDHIPR & CCM_CDHIPR_PERIPH_CLK_SEL_BUSY_MASK);
+
+    __DSB();
+    __ISB();
+
+
+    // Bazi projeler DWT_CYCCNT sifirlayip core frekansini olcer veya GPIO toggle ile test eder.
+    // Asagida bunun icin ornek bir test fonksiyonu cagirabilirsin.
+    
+/*
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+
+    // ... biraz bekle ...
+    uint32_t cycles = DWT->CYCCNT;
+*/
 }

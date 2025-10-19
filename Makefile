@@ -11,7 +11,7 @@ INC_DIRS	= include include/FreeRTOS_include include/CMSIS
 LIB_DIR		= lib
 
 MCU			= -mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard
-CFLAGS		= $(MCU) -Wall -Wextra -O2 -ffunction-sections -fdata-sections -DCPU_MIMXRT1062CVJ5A
+CFLAGS		= $(MCU) -Wall -Wextra -O2 -ffunction-sections -fdata-sections
 CXXFLAGS	= $(CFLAGS) -fno-exceptions -fno-rtti
 LDFLAGS		= $(MCU) -Wl,--gc-sections,--no-warn-rwx-segments --specs=nosys.specs -TMIMXRT1062xxxxx_flexspi_nor.ld
 
