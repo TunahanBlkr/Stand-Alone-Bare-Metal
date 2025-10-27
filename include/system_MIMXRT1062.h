@@ -25,7 +25,17 @@ extern "C" {
 
 /* Define clock source values */
 
-#define CPU_XTAL_CLK_HZ                24000000UL          /* Value of the external crystal or oscillator clock frequency in Hz */
+#define CPU_XTAL_CLK_HZ                   24000000UL          /* Value of the external crystal or oscillator clock frequency in Hz */
+#define CCM_ANALOG_PLL_ARM_MULT_VALUE     22U                 // PLL ARM carpani
+#define CCM_ANALOG_PLL_ARM_DIV_VALUE      1U                  // PLL ARM bolucusu
+
+#define CPU_PLL_CLK_HZ                    ((CPU_XTAL_CLK_HZ * CCM_ANALOG_PLL_ARM_MULT_VALUE) / CCM_ANALOG_PLL_ARM_DIV_VALUE)
+
+#define AHB_DIV_VALUE                     4U
+#define IPG_DIV_VALUE                     2U
+
+#define CPU_AHB_CLK_HZ                    (CPU_PLL_CLK_HZ / AHB_DIV_VALUE)
+#define CPU_IPG_CLK_HZ                    (CPU_AHB_CLK_HZ / IPG_DIV_VALUE)
 
 
 /**

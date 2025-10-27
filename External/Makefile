@@ -31,6 +31,11 @@ $(LIB_DIR)/$(LIB_NAME): $(OBJS)
 	$(AR) rcs $@ $(OBJS)
 
 clean:
+ifeq ($(OS),Windows_NT)
+	if exist "$(BUILD_DIR)\*.o" del /Q "$(BUILD_DIR)\*.o"
+	if exist "..\lib\$(LIB_NAME)" del /Q "..\lib\$(LIB_NAME)"
+else
 	rm -rf $(BUILD_DIR)/*.o $(LIB_DIR)/$(LIB_NAME)
+endif
 
 .PHONY: all clean

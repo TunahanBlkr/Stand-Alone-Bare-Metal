@@ -83,9 +83,9 @@ __attribute__ ((weak)) void SystemInitHook (void) {
     CCM_ANALOG->PLL_ARM |= CCM_ANALOG_PLL_ARM_POWERDOWN_MASK; // PLL'i Kapat
 
     CCM_ANALOG->PLL_ARM &= ~CCM_ANALOG_PLL_ARM_DIV_SELECT_MASK;
-    CCM_ANALOG->PLL_ARM |= CCM_ANALOG_PLL_ARM_DIV_SELECT(22); // Carpan Degeri Ayari ( 24MHz * 22 = 528MHz )
+    CCM_ANALOG->PLL_ARM |= CCM_ANALOG_PLL_ARM_DIV_SELECT(CCM_ANALOG_PLL_ARM_MULT_VALUE); // Carpan Degeri Ayari ( 24MHz * 22 = 528MHz )
 
-    CCM->CACRR = 0U; // Saat Bolucu Degeri Ayari
+    CCM->CACRR = (CCM_ANALOG_PLL_ARM_DIV_VALUE - 1U); // Saat Bolucu Degeri Ayari
 
     CCM_ANALOG->PLL_ARM &= ~CCM_ANALOG_PLL_ARM_POWERDOWN_MASK; // PLL'e Guc Ver
 
@@ -107,12 +107,12 @@ __attribute__ ((weak)) void SystemInitHook (void) {
 
     // AHB clock = ARM / 4 (132 MHz)
     CCM->CBCDR &= ~CCM_CBCDR_AHB_PODF_MASK;
-    CCM->CBCDR |= CCM_CBCDR_AHB_PODF(3); // bolucu = 4
+    CCM->CBCDR |= CCM_CBCDR_AHB_PODF(AHB_DIV_VALUE - 1U); // bolucu = 4
     while(CCM->CDHIPR & CCM_CDHIPR_AHB_PODF_BUSY_MASK);
 
     // IPG clock = AHB / 2 (66 MHz)
     CCM->CBCDR &= ~CCM_CBCDR_IPG_PODF_MASK;
-    CCM->CBCDR |= CCM_CBCDR_IPG_PODF(1); // bolucu = 2
+    CCM->CBCDR |= CCM_CBCDR_IPG_PODF(IPG_DIV_VALUE - 1U); // bolucu = 2
     while(CCM->CDHIPR & CCM_CDHIPR_AHB_PODF_BUSY_MASK); // IPG_PODF degisimi AHB handshake ile yapilir; ayri IPG_BUSY biti yok
 
     CCM->CBCMR &= ~CCM_CBCMR_PRE_PERIPH_CLK_SEL_MASK;

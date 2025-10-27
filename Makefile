@@ -71,6 +71,23 @@ $(BUILD_DIR)/$(TARGET).hex: $(BUILD_DIR)/$(TARGET).elf
 ###############################################################################
 
 clean:
+ifeq ($(OS),Windows_NT)
+	if exist "$(BUILD_DIR)\*.elf" del /Q "$(BUILD_DIR)\*.elf"
+	if exist "$(BUILD_DIR)\*.hex" del /Q "$(BUILD_DIR)\*.hex"
+	if exist "$(BUILD_DIR)\Object_Files\*.o" del /Q "$(BUILD_DIR)\Object_Files\*.o"
+else
 	rm -f $(BUILD_DIR)/*.elf $(BUILD_DIR)/*.hex $(OBJ_DIR)/*.o
+endif
+
+clean_all:
+ifeq ($(OS),Windows_NT)
+	if exist "$(BUILD_DIR)\*.elf" del /Q "$(BUILD_DIR)\*.elf"
+	if exist "$(BUILD_DIR)\*.hex" del /Q "$(BUILD_DIR)\*.hex"
+	if exist "$(BUILD_DIR)\Object_Files\*.o" del /Q "$(BUILD_DIR)\Object_Files\*.o"
+	$(MAKE) -C External clean
+else
+	rm -f $(BUILD_DIR)/*.elf $(BUILD_DIR)/*.hex $(OBJ_DIR)/*.o
+	$(MAKE) -C External clean
+endif
 
 .PHONY: all clean
