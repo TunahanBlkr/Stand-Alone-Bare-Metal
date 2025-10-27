@@ -78,6 +78,8 @@ __attribute__ ((weak)) void SystemInitHook (void) {
     IOMUXC_GPR->GPR16 &= ~IOMUXC_GPR_GPR16_FLEXRAM_BANK_CFG_SEL_MASK;
     IOMUXC_GPR->GPR16 |= IOMUXC_GPR_GPR16_FLEXRAM_BANK_CFG_SEL(0);
 
+    IOMUXC_GPR->GPR3 |= IOMUXC_GPR_GPR3_OCRAM_CTL(0x3U); // read data wait enable
+
     CCM_ANALOG->PLL_ARM |= CCM_ANALOG_PLL_ARM_BYPASS_MASK; // PLL bypass enable
     
     CCM_ANALOG->PLL_ARM |= CCM_ANALOG_PLL_ARM_POWERDOWN_MASK; // PLL'i Kapat
@@ -85,7 +87,8 @@ __attribute__ ((weak)) void SystemInitHook (void) {
     CCM_ANALOG->PLL_ARM &= ~CCM_ANALOG_PLL_ARM_DIV_SELECT_MASK;
     CCM_ANALOG->PLL_ARM |= CCM_ANALOG_PLL_ARM_DIV_SELECT(CCM_ANALOG_PLL_ARM_MULT_VALUE); // Carpan Degeri Ayari ( 24MHz * 22 = 528MHz )
 
-    CCM->CACRR = (CCM_ANALOG_PLL_ARM_DIV_VALUE - 1U); // Saat Bolucu Degeri Ayari
+    CCM->CACRR &= ~CCM_CACRR_ARM_PODF_MASK;
+    CCM->CACRR |= CCM_CACRR_ARM_PODF(CCM_ANALOG_PLL_ARM_DIV_VALUE - 1U); // Saat Bolucu Degeri Ayari
 
     CCM_ANALOG->PLL_ARM &= ~CCM_ANALOG_PLL_ARM_POWERDOWN_MASK; // PLL'e Guc Ver
 
@@ -105,7 +108,15 @@ __attribute__ ((weak)) void SystemInitHook (void) {
         // PLL Lock Fail
     }
 
-    // AHB clock = ARM / 4 (132 MHz)
+    CCM->CBCMR &= ~CCM_CBCMR_PRE_PERIPH_CLK_SEL_MASK;
+    CCM->CBCMR |=  CCM_CBCMR_PRE_PERIPH_CLK_SEL(0);  // 3 = PLL2 (528 MHz)
+    (void)CCM->CBCMR;
+
+    CCM->CBCDR &= ~CCM_CBCDR_PERIPH_CLK_SEL_MASK;
+    CCM->CBCDR |= CCM_CBCDR_PERIPH_CLK_SEL(0); // PLL2 secildi
+    while(CCM->CDHIPR & CCM_CDHIPR_PERIPH_CLK_SEL_BUSY_MASK);
+
+    // AHB clock = PLL2 / 4 (132 MHz)
     CCM->CBCDR &= ~CCM_CBCDR_AHB_PODF_MASK;
     CCM->CBCDR |= CCM_CBCDR_AHB_PODF(AHB_DIV_VALUE - 1U); // bolucu = 4
     while(CCM->CDHIPR & CCM_CDHIPR_AHB_PODF_BUSY_MASK);
@@ -114,14 +125,6 @@ __attribute__ ((weak)) void SystemInitHook (void) {
     CCM->CBCDR &= ~CCM_CBCDR_IPG_PODF_MASK;
     CCM->CBCDR |= CCM_CBCDR_IPG_PODF(IPG_DIV_VALUE - 1U); // bolucu = 2
     while(CCM->CDHIPR & CCM_CDHIPR_AHB_PODF_BUSY_MASK); // IPG_PODF degisimi AHB handshake ile yapilir; ayri IPG_BUSY biti yok
-
-    CCM->CBCMR &= ~CCM_CBCMR_PRE_PERIPH_CLK_SEL_MASK;
-    CCM->CBCMR |=  CCM_CBCMR_PRE_PERIPH_CLK_SEL(3);  // 3 = PLL1
-    (void)CCM->CBCMR;
-
-    CCM->CBCDR &= ~CCM_CBCDR_PERIPH_CLK_SEL_MASK;
-    CCM->CBCDR |= CCM_CBCDR_PERIPH_CLK_SEL(0); // PLL1 secildi
-    while(CCM->CDHIPR & CCM_CDHIPR_PERIPH_CLK_SEL_BUSY_MASK);
 
     __DSB();
     __ISB();
