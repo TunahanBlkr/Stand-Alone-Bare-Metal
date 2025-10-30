@@ -109,7 +109,7 @@ __attribute__ ((weak)) void SystemInitHook (void) {
     }
 
     CCM->CBCMR &= ~CCM_CBCMR_PRE_PERIPH_CLK_SEL_MASK;
-    CCM->CBCMR |=  CCM_CBCMR_PRE_PERIPH_CLK_SEL(0);  // 3 = PLL2 (528 MHz)
+    CCM->CBCMR |=  CCM_CBCMR_PRE_PERIPH_CLK_SEL(0);  // 0 = PLL2 (528 MHz)
     (void)CCM->CBCMR;
 
     CCM->CBCDR &= ~CCM_CBCDR_PERIPH_CLK_SEL_MASK;

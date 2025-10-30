@@ -36,6 +36,10 @@ extern QueueHandle_t LPUART6_RX_QUEUE;
 extern QueueHandle_t LPUART7_TX_QUEUE;
 extern QueueHandle_t LPUART7_RX_QUEUE;
 
+extern uint8_t LPUART_FIFO_SIZE;
+
+#define LPUART_TXCOUNT(uart)    (((uart)->WATER & LPUART_WATER_TXCOUNT_MASK) >> LPUART_WATER_TXCOUNT_SHIFT)
+
 void LPUART1_INIT(uint32_t baudrate); // Pin 0/RX1, 1/TX1 - Pinler Yanlis olabilir, kontrol et.
 void LPUART1_IRQHandler(void);
 void LPUART1_Write_Char(char c);
