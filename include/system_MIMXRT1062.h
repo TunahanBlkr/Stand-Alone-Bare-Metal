@@ -26,20 +26,24 @@ extern "C" {
 /* Define clock source values */
 
 #define CPU_XTAL_CLK_HZ                   24000000UL          /* Value of the external crystal or oscillator clock frequency in Hz */
-#define CCM_ANALOG_PLL_ARM_MULT_VALUE     22UL                // PLL ARM carpani
-#define CCM_ANALOG_PLL_ARM_DIV_VALUE      1UL                 // PLL ARM bolucusu
 
-#define CPU_PLL1_CLK_HZ                   ((CPU_XTAL_CLK_HZ * CCM_ANALOG_PLL_ARM_MULT_VALUE) / CCM_ANALOG_PLL_ARM_DIV_VALUE)
-#define CPU_PLL2_CLK_HZ                   528000000UL
-#define CPU_PLL3_CLK_HZ                   480000000UL
+#define CCM_ANALOG_PLL_ARM_CLK_HZ         528000000UL
+#define CCM_ANALOG_PLL_SYS_CLK_HZ         528000000UL
 
-#define CPU_UART_CLK_HZ                   80000000UL
-
-#define AHB_DIV_VALUE                     4UL
-#define IPG_DIV_VALUE                     2UL
-
-#define CPU_AHB_CLK_HZ                    (CPU_PLL2_CLK_HZ / AHB_DIV_VALUE)
-#define CPU_IPG_CLK_HZ                    (CPU_AHB_CLK_HZ / IPG_DIV_VALUE)
+#define CCM_AHB_CLK_HZ                    132000000UL
+#define CCM_IPG_CLK_HZ                    66000000UL
+#define CCM_PERCLK_CLK_HZ                 66000000UL
+#define CCM_USDHC1_CLK_HZ                 66000000UL
+#define CCM_USDHC2_CLK_HZ                 66000000UL
+#define CCM_SEMC_CLK_HZ                   132000000UL
+#define CCM_CSI_CLK_HZ                    60000000UL
+#define CCM_FLEXSPI_CLK_HZ                66000000UL
+#define CCM_LPSPI_CLK_HZ                  66000000UL
+#define CCM_TRACE_CLK_HZ                  132000000UL
+#define CCM_LPI2C_CLK_HZ                  60000000UL
+#define CCM_CAN_CLK_HZ                    40000000UL
+#define CCM_UART_CLK_HZ                   24000000UL
+#define CCM_LCDIF_CLK_HZ                  // PLL5 AYARLA - PLL5 / 4
 
 
 /**
@@ -62,6 +66,21 @@ void SystemInit (void);
  * initialization of these variables happens after this function.
  */
 void SystemInitHook (void);
+
+void PLL_ARM_CLK_Init(void);
+void PLL_SYS_CLK_Init(void);
+void PLL_USB1_CLK_Init(void);
+void PLL_VIDEO_CLK_Init(void);
+
+void USDHC1_CLK_Init(void);
+void USDHC2_CLK_Init(void);
+void CSI_CLK_Init(void);
+void LPSPI_CLK_Init(void);
+void TRACE_CLK_Init(void);
+void LPI2C_CLK_Init(void);
+void CAN_CLK_Init(void);
+void UART_CLK_Init(void);
+void LCDIF_CLK_Init(void);
 
 #ifdef __cplusplus
 }

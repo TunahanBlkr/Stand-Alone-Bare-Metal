@@ -11,7 +11,7 @@ extern "C" {
 
 #define UART_TX_BUFFER_SIZE     128
 #define UART_RX_BUFFER_SIZE     128
-#define UART_CLK_FREQ           CPU_UART_CLK_HZ // 80 MHz UART Clock
+#define UART_CLK_FREQ           CCM_UART_CLK_HZ
 
 // #define UART_INIT(x, baud)    LPUART##x##_INIT(baud)
 

@@ -44,7 +44,7 @@ void LPUART1_INIT(uint32_t baudrate) {
     LPUART1->GLOBAL &= ~LPUART_GLOBAL_RST_MASK;
 
     // Modulu kapat
-    LPUART1->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK);
+    LPUART1->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART1->FIFO |= (LPUART_FIFO_TXFE_MASK | LPUART_FIFO_RXFE_MASK);
     LPUART1->FIFO |= (LPUART_FIFO_TXFLUSH_MASK | LPUART_FIFO_RXFLUSH_MASK);
@@ -61,7 +61,7 @@ void LPUART1_INIT(uint32_t baudrate) {
     LPUART1->BAUD |= LPUART_BAUD_SBR(sbr);
 
     // 8-bit, no parity
-    LPUART1->CTRL = 0;
+    LPUART1->CTRL = 0; // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART1->CTRL |= (LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // TX ve RX enable
     LPUART1->CTRL |= LPUART_CTRL_RIE_MASK; // RX interrupt enable - TX kesmesi LPUART1_Write_Char sonrasi acilacak
@@ -74,6 +74,9 @@ void LPUART1_INIT(uint32_t baudrate) {
 
     // NVIC interrupt enable (IRQn LPUART1)
     NVIC_EnableIRQ(LPUART1_IRQn);
+
+    // Modulu ac
+    LPUART1->CTRL |= LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK;
 }
 
 void LPUART1_IRQHandler(void) {
@@ -141,7 +144,7 @@ void LPUART2_INIT(uint32_t baudrate) {
     LPUART2->GLOBAL &= ~LPUART_GLOBAL_RST_MASK;
 
     // Modulu kapat
-    LPUART2->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK);
+    LPUART2->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART2->FIFO |= (LPUART_FIFO_TXFE_MASK | LPUART_FIFO_RXFE_MASK);
     LPUART2->FIFO |= (LPUART_FIFO_TXFLUSH_MASK | LPUART_FIFO_RXFLUSH_MASK);
@@ -158,7 +161,7 @@ void LPUART2_INIT(uint32_t baudrate) {
     LPUART2->BAUD |= LPUART_BAUD_SBR(sbr);
 
     // 8-bit, no parity
-    LPUART2->CTRL = 0;
+    LPUART2->CTRL = 0; // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART2->CTRL |= (LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // TX ve RX enable
     LPUART2->CTRL |= LPUART_CTRL_RIE_MASK; // RX interrupt enable - TX kesmesi LPUART2_Write_Char sonrasi acilacak
@@ -171,6 +174,9 @@ void LPUART2_INIT(uint32_t baudrate) {
 
     // NVIC interrupt enable (IRQn LPUART2)
     NVIC_EnableIRQ(LPUART2_IRQn);
+
+    // Modulu ac
+    LPUART2->CTRL |= LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK;
 }
 
 void LPUART2_IRQHandler(void) {
@@ -238,7 +244,7 @@ void LPUART3_INIT(uint32_t baudrate) {
     LPUART3->GLOBAL &= ~LPUART_GLOBAL_RST_MASK;
 
     // Modulu kapat
-    LPUART3->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK);
+    LPUART3->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART3->FIFO |= (LPUART_FIFO_TXFE_MASK | LPUART_FIFO_RXFE_MASK);
     LPUART3->FIFO |= (LPUART_FIFO_TXFLUSH_MASK | LPUART_FIFO_RXFLUSH_MASK);
@@ -255,7 +261,7 @@ void LPUART3_INIT(uint32_t baudrate) {
     LPUART3->BAUD |= LPUART_BAUD_SBR(sbr);
 
     // 8-bit, no parity
-    LPUART3->CTRL = 0;
+    LPUART3->CTRL = 0; // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART3->CTRL |= (LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // TX ve RX enable
     LPUART3->CTRL |= LPUART_CTRL_RIE_MASK; // RX interrupt enable - TX kesmesi LPUART3_Write_Char sonrasi acilacak
@@ -268,6 +274,9 @@ void LPUART3_INIT(uint32_t baudrate) {
 
     // NVIC interrupt enable (IRQn LPUART3)
     NVIC_EnableIRQ(LPUART3_IRQn);
+
+    // Modulu ac
+    LPUART3->CTRL |= LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK;
 }
 
 void LPUART3_IRQHandler(void) {
@@ -335,7 +344,7 @@ void LPUART4_INIT(uint32_t baudrate) {
     LPUART4->GLOBAL &= ~LPUART_GLOBAL_RST_MASK;
 
     // Modulu kapat
-    LPUART4->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK);
+    LPUART4->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART4->FIFO |= (LPUART_FIFO_TXFE_MASK | LPUART_FIFO_RXFE_MASK);
     LPUART4->FIFO |= (LPUART_FIFO_TXFLUSH_MASK | LPUART_FIFO_RXFLUSH_MASK);
@@ -352,7 +361,7 @@ void LPUART4_INIT(uint32_t baudrate) {
     LPUART4->BAUD |= LPUART_BAUD_SBR(sbr);
 
     // 8-bit, no parity
-    LPUART4->CTRL = 0;
+    LPUART4->CTRL = 0; // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART4->CTRL |= (LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // TX ve RX enable
     LPUART4->CTRL |= LPUART_CTRL_RIE_MASK; // RX interrupt enable - TX kesmesi LPUART4_Write_Char sonrasi acilacak
@@ -365,6 +374,9 @@ void LPUART4_INIT(uint32_t baudrate) {
 
     // NVIC interrupt enable (IRQn LPUART4)
     NVIC_EnableIRQ(LPUART4_IRQn);
+
+    // Modulu ac
+    LPUART4->CTRL |= LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK;
 }
 
 void LPUART4_IRQHandler(void) {
@@ -432,7 +444,7 @@ void LPUART5_INIT(uint32_t baudrate) {
     LPUART5->GLOBAL &= ~LPUART_GLOBAL_RST_MASK;
 
     // Modulu kapat
-    LPUART5->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK);
+    LPUART5->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART5->FIFO |= (LPUART_FIFO_TXFE_MASK | LPUART_FIFO_RXFE_MASK);
     LPUART5->FIFO |= (LPUART_FIFO_TXFLUSH_MASK | LPUART_FIFO_RXFLUSH_MASK);
@@ -449,7 +461,7 @@ void LPUART5_INIT(uint32_t baudrate) {
     LPUART5->BAUD |= LPUART_BAUD_SBR(sbr);
 
     // 8-bit, no parity
-    LPUART5->CTRL = 0;
+    LPUART5->CTRL = 0; // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART5->CTRL |= (LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // TX ve RX enable
     LPUART5->CTRL |= LPUART_CTRL_RIE_MASK; // RX interrupt enable - TX kesmesi LPUART5_Write_Char sonrasi acilacak
@@ -462,6 +474,9 @@ void LPUART5_INIT(uint32_t baudrate) {
 
     // NVIC interrupt enable (IRQn LPUART5)
     NVIC_EnableIRQ(LPUART5_IRQn);
+
+    // Modulu ac
+    LPUART5->CTRL |= LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK;
 }
 
 void LPUART5_IRQHandler(void) {
@@ -529,7 +544,7 @@ void LPUART6_INIT(uint32_t baudrate) {
     LPUART6->GLOBAL &= ~LPUART_GLOBAL_RST_MASK;
 
     // Modulu kapat
-    LPUART6->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK);
+    LPUART6->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART6->FIFO |= (LPUART_FIFO_TXFE_MASK | LPUART_FIFO_RXFE_MASK);
     LPUART6->FIFO |= (LPUART_FIFO_TXFLUSH_MASK | LPUART_FIFO_RXFLUSH_MASK);
@@ -546,7 +561,7 @@ void LPUART6_INIT(uint32_t baudrate) {
     LPUART6->BAUD |= LPUART_BAUD_SBR(sbr);
 
     // 8-bit, no parity
-    LPUART6->CTRL = 0;
+    LPUART6->CTRL = 0; // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART6->CTRL |= (LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // TX ve RX enable
     LPUART6->CTRL |= LPUART_CTRL_RIE_MASK; // RX interrupt enable - TX kesmesi LPUART6_Write_Char sonrasi acilacak
@@ -559,6 +574,9 @@ void LPUART6_INIT(uint32_t baudrate) {
 
     // NVIC interrupt enable (IRQn LPUART6)
     NVIC_EnableIRQ(LPUART6_IRQn);
+
+    // Modulu ac
+    LPUART6->CTRL |= LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK;
 }
 
 void LPUART6_IRQHandler(void) {
@@ -626,7 +644,7 @@ void LPUART7_INIT(uint32_t baudrate) {
     LPUART7->GLOBAL &= ~LPUART_GLOBAL_RST_MASK;
 
     // Modulu kapat
-    LPUART7->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK);
+    LPUART7->CTRL &= ~(LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART7->FIFO |= (LPUART_FIFO_TXFE_MASK | LPUART_FIFO_RXFE_MASK);
     LPUART7->FIFO |= (LPUART_FIFO_TXFLUSH_MASK | LPUART_FIFO_RXFLUSH_MASK);
@@ -643,7 +661,7 @@ void LPUART7_INIT(uint32_t baudrate) {
     LPUART7->BAUD |= LPUART_BAUD_SBR(sbr);
 
     // 8-bit, no parity
-    LPUART7->CTRL = 0;
+    LPUART7->CTRL = 0; // UART reset atinca sifirlandi zaten. Bu satir sadece okunabilirlik daha kolay olsun diye var.
 
     LPUART7->CTRL |= (LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK); // TX ve RX enable
     LPUART7->CTRL |= LPUART_CTRL_RIE_MASK; // RX interrupt enable - TX kesmesi LPUART7_Write_Char sonrasi acilacak
@@ -656,6 +674,9 @@ void LPUART7_INIT(uint32_t baudrate) {
 
     // NVIC interrupt enable (IRQn LPUART7)
     NVIC_EnableIRQ(LPUART7_IRQn);
+
+    // Modulu ac
+    LPUART7->CTRL |= LPUART_CTRL_TE_MASK | LPUART_CTRL_RE_MASK;
 }
 
 void LPUART7_IRQHandler(void) {
