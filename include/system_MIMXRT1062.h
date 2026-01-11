@@ -1,3 +1,47 @@
+/*
+** ###################################################################
+**     Processors:          MIMXRT1062CVJ5A
+**                          MIMXRT1062CVL5A
+**                          MIMXRT1062DVJ6A
+**                          MIMXRT1062DVL6A
+**
+**     Compilers:           Freescale C/C++ for Embedded ARM
+**                          GNU C Compiler
+**                          IAR ANSI C/C++ Compiler for ARM
+**                          Keil ARM C/C++ Compiler
+**                          MCUXpresso Compiler
+**
+**     Reference manual:    IMXRT1060RM Rev.1, 12/2018 | IMXRT1060SRM Rev.3
+**     Version:             rev. 1.2, 2019-04-29
+**     Build:               b191113
+**
+**     Abstract:
+**         Provides a system configuration function and a global variable that
+**         contains the system frequency. It configures the device and initializes
+**         the oscillator (PLL) that is part of the microcontroller device.
+**
+**     Copyright 2016 Freescale Semiconductor, Inc.
+**     Copyright 2016-2019 NXP
+**     All rights reserved.
+**
+**     SPDX-License-Identifier: BSD-3-Clause
+**
+**     http:                 www.nxp.com
+**     mail:                 support@nxp.com
+**
+**     Revisions:
+**     - rev. 0.1 (2017-01-10)
+**         Initial version.
+**     - rev. 1.0 (2018-11-16)
+**         Update header files to align with IMXRT1060RM Rev.0.
+**     - rev. 1.1 (2018-11-27)
+**         Update header files to align with IMXRT1060RM Rev.1.
+**     - rev. 1.2 (2019-04-29)
+**         Add SET/CLR/TOG register group to register CTRL, STAT, CHANNELCTRL, CH0STAT, CH0OPTS, CH1STAT, CH1OPTS, CH2STAT, CH2OPTS, CH3STAT, CH3OPTS of DCP module.
+**
+** ###################################################################
+*/
+
 /*!
  * @file MIMXRT1062
  * @version 1.2
@@ -36,52 +80,13 @@ extern "C" {
 #define CCM_PERCLK_CLK_HZ                 66000000UL
 #define CCM_USDHC1_CLK_HZ                 66000000UL
 #define CCM_USDHC2_CLK_HZ                 66000000UL
-#define CCM_SEMC_CLK_HZ                   132000000UL
 #define CCM_CSI_CLK_HZ                    60000000UL
-#define CCM_FLEXSPI_CLK_HZ                66000000UL
 #define CCM_LPSPI_CLK_HZ                  66000000UL
 #define CCM_TRACE_CLK_HZ                  132000000UL
 #define CCM_LPI2C_CLK_HZ                  60000000UL
 #define CCM_CAN_CLK_HZ                    40000000UL
 #define CCM_UART_CLK_HZ                   24000000UL
 #define CCM_LCDIF_CLK_HZ                  // PLL5 AYARLA - PLL5 / 4
-
-
-/**
- * @brief Setup the microcontroller system.
- *
- * Typically this function configures the oscillator (PLL) that is part of the
- * microcontroller device. For systems with variable clock speed it also updates
- * the variable SystemCoreClock. SystemInit is called from startup_device file.
- */
-void SystemInit (void);
-
-/**
- * @brief SystemInit function hook.
- *
- * This weak function allows to call specific initialization code during the
- * SystemInit() execution.This can be used when an application specific code needs
- * to be called as close to the reset entry as possible (for example the Multicore
- * Manager MCMGR_EarlyInit() function call).
- * NOTE: No global r/w variables can be used in this hook function because the
- * initialization of these variables happens after this function.
- */
-void SystemInitHook (void);
-
-void PLL_ARM_CLK_Init(void);
-void PLL_SYS_CLK_Init(void);
-void PLL_USB1_CLK_Init(void);
-void PLL_VIDEO_CLK_Init(void);
-
-void USDHC1_CLK_Init(void);
-void USDHC2_CLK_Init(void);
-void CSI_CLK_Init(void);
-void LPSPI_CLK_Init(void);
-void TRACE_CLK_Init(void);
-void LPI2C_CLK_Init(void);
-void CAN_CLK_Init(void);
-void UART_CLK_Init(void);
-void LCDIF_CLK_Init(void);
 
 #ifdef __cplusplus
 }

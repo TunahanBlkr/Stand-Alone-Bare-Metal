@@ -53,7 +53,7 @@
  * settings.  Your application will certainly need a different value so set this
  * correctly. This is very often, but not always, equal to the main system clock
  * frequency. */
-#define configCPU_CLOCK_HZ                          528000000UL
+#define configCPU_CLOCK_HZ                          132000000UL
 
 /* configSYSTICK_CLOCK_HZ is an optional parameter for ARM Cortex-M ports only.
  *
@@ -119,7 +119,7 @@
 
 /* configMAX_TASK_NAME_LEN sets the maximum length (in characters) of a task's
  * human readable name.  Includes the NULL terminator. */
-#define configMAX_TASK_NAME_LEN                    16
+#define configMAX_TASK_NAME_LEN                    20
 
 /* Time is measured in 'ticks' - which is the number of times the tick interrupt
  * has executed since the RTOS kernel was started.
@@ -142,7 +142,7 @@
  * application task if there is an Idle priority (priority 0) application task
  * that can run.  Set to 0 to have the Idle task use all of its timeslice.
  * Default to 1 if left undefined. */
-#define configIDLE_SHOULD_YIELD                    4
+#define configIDLE_SHOULD_YIELD                    1
 
 /* Each task has an array of task notifications.
  * configTASK_NOTIFICATION_ARRAY_ENTRIES sets the number of indexes in the
@@ -234,7 +234,7 @@
  * task.  See
  * https://www.freertos.org/RTOS-software-timer-service-daemon-task.html Only
  * used if configUSE_TIMERS is set to 1. */
-#define configTIMER_TASK_STACK_DEPTH    ( 1536U / 4U )
+#define configTIMER_TASK_STACK_DEPTH    ( configMINIMAL_STACK_SIZE * 2 )
 
 /* configTIMER_QUEUE_LENGTH sets the length of the queue (the number of discrete
  * items the queue can hold) used to send commands to the timer task.  See
@@ -287,7 +287,7 @@
  * or heap_4.c are included in the build.  This value is defaulted to 4096 bytes
  * but it must be tailored to each application.  Note the heap will appear in
  * the .bss section.  See https://www.freertos.org/a00111.html. */
-#define configTOTAL_HEAP_SIZE                        ((size_t)(28 * 1024))
+#define configTOTAL_HEAP_SIZE                        ((size_t)(10240))
 
 /* Set configAPPLICATION_ALLOCATED_HEAP to 1 to have the application allocate
  * the array used as the FreeRTOS heap.  Set to 0 to have the linker allocate
@@ -311,11 +311,23 @@
 /* Interrupt nesting behaviour configuration. *********************************/
 /******************************************************************************/
 
+#define configPRIO_BITS                                 4
+
+/* The lowest interrupt priority that can be used in a call to a "set priority"
+function. */
+#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY         ((1U << (configPRIO_BITS)) - 1)
+
+/* The highest interrupt priority that can be used by any interrupt service
+routine that makes calls to interrupt safe FreeRTOS API functions.  DO NOT CALL
+INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER
+PRIORITY THAN THIS! (higher priorities are lower numeric values. */
+#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY    2
+
 /* configKERNEL_INTERRUPT_PRIORITY sets the priority of the tick and context
  * switch performing interrupts.  Not supported by all FreeRTOS ports.  See
  * https://www.freertos.org/RTOS-Cortex-M3-M4.html for information specific to
  * ARM Cortex-M devices. */
-#define configKERNEL_INTERRUPT_PRIORITY          15
+#define configKERNEL_INTERRUPT_PRIORITY                 (configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
 
 /* configMAX_SYSCALL_INTERRUPT_PRIORITY sets the interrupt priority above which
  * FreeRTOS API calls must not be made.  Interrupts above this priority are
@@ -323,11 +335,7 @@
  * to the highest interrupt priority (0).  Not supported by all FreeRTOS ports.
  * See https://www.freertos.org/RTOS-Cortex-M3-M4.html for information specific
  * to ARM Cortex-M devices. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY     5
-
-/* Another name for configMAX_SYSCALL_INTERRUPT_PRIORITY - the name used depends
- * on the FreeRTOS port. */
-#define configMAX_API_CALL_INTERRUPT_PRIORITY    0
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY            (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
 
 /******************************************************************************/
 /* Hook and callback function related definitions. ****************************/
@@ -401,7 +409,7 @@
 /* configMAX_CO_ROUTINE_PRIORITIES defines the number of priorities available
  * to the application co-routines. Any number of co-routines can share the same
  * priority. Defaults to 0 if left undefined. */
-#define configMAX_CO_ROUTINE_PRIORITIES    1
+#define configMAX_CO_ROUTINE_PRIORITIES    2
 
 /******************************************************************************/
 /* Debugging assistance. ******************************************************/
@@ -628,6 +636,10 @@
  *
  * Defaults to 1 if left undefined. */
 #define configCHECK_HANDLER_INSTALLATION    1
+
+#define vPortSVCHandler      SVC_Handler
+#define xPortPendSVHandler   PendSV_Handler
+#define xPortSysTickHandler  SysTick_Handler
 
 /******************************************************************************/
 /* Definitions that include or exclude functionality. *************************/
