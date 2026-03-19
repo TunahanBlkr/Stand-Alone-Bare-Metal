@@ -8,6 +8,7 @@ extern "C" {
 #include "MIMXRT1062.h"
 
 void Configure_PLL_CLK(void);
+void OpenCloks(void);
 
 void PLL_ARM_CLK_Init(void);
 void PLL_SYS_CLK_Init(void);

@@ -76,8 +76,8 @@ extern "C" {
 #define CCM_ANALOG_PLL_USB1_CLK_HZ        480000000UL
 
 #define CCM_AHB_CLK_HZ                    132000000UL
-#define CCM_IPG_CLK_HZ                    66000000UL
-#define CCM_PERCLK_CLK_HZ                 66000000UL
+#define CCM_IPG_CLK_HZ                    44000000UL
+#define CCM_PERCLK_CLK_HZ                 44000000UL
 #define CCM_USDHC1_CLK_HZ                 66000000UL
 #define CCM_USDHC2_CLK_HZ                 66000000UL
 #define CCM_CSI_CLK_HZ                    60000000UL

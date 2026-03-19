@@ -244,6 +244,67 @@ extern "C" {
 #define PIN54_MUX       kIOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_29
 
 /********************************************************************************************************************************/
+/*                                                   PIN_MUX_MODE_MASK                                                          */
+/********************************************************************************************************************************/
+
+#define PIN0_MUX_MODE_MASK      0x7
+#define PIN1_MUX_MODE_MASK      0x7
+#define PIN2_MUX_MODE_MASK      0x7
+#define PIN3_MUX_MODE_MASK      0x7
+#define PIN4_MUX_MODE_MASK      0x7
+#define PIN5_MUX_MODE_MASK      0x7
+#define PIN6_MUX_MODE_MASK      0xF
+#define PIN7_MUX_MODE_MASK      0xF
+#define PIN8_MUX_MODE_MASK      0xF
+#define PIN9_MUX_MODE_MASK      0xF
+#define PIN10_MUX_MODE_MASK     0xF
+#define PIN11_MUX_MODE_MASK     0xF
+#define PIN12_MUX_MODE_MASK     0xF
+#define PIN13_MUX_MODE_MASK     0xF
+#define PIN14_MUX_MODE_MASK     0xF
+#define PIN15_MUX_MODE_MASK     0xF
+#define PIN16_MUX_MODE_MASK     0xF
+#define PIN17_MUX_MODE_MASK     0xF
+#define PIN18_MUX_MODE_MASK     0xF
+#define PIN19_MUX_MODE_MASK     0xF
+#define PIN20_MUX_MODE_MASK     0xF
+#define PIN21_MUX_MODE_MASK     0xF
+#define PIN22_MUX_MODE_MASK     0xF
+#define PIN23_MUX_MODE_MASK     0xF
+#define PIN24_MUX_MODE_MASK     0x7
+#define PIN25_MUX_MODE_MASK     0x7
+#define PIN26_MUX_MODE_MASK     0xF
+#define PIN27_MUX_MODE_MASK     0xF
+#define PIN28_MUX_MODE_MASK     0xF
+#define PIN29_MUX_MODE_MASK     0xF
+#define PIN30_MUX_MODE_MASK     0xF
+#define PIN31_MUX_MODE_MASK     0xF
+#define PIN32_MUX_MODE_MASK     0xF
+#define PIN33_MUX_MODE_MASK     0x7
+#define PIN34_MUX_MODE_MASK     0xF
+#define PIN35_MUX_MODE_MASK     0xF
+#define PIN36_MUX_MODE_MASK     0xF
+#define PIN37_MUX_MODE_MASK     0xF
+#define PIN38_MUX_MODE_MASK     0xF
+#define PIN39_MUX_MODE_MASK     0xF
+#define PIN40_MUX_MODE_MASK     0xF
+#define PIN41_MUX_MODE_MASK     0xF
+#define PIN42_MUX_MODE_MASK     0xF
+#define PIN43_MUX_MODE_MASK     0xF
+#define PIN44_MUX_MODE_MASK     0xF
+#define PIN45_MUX_MODE_MASK     0xF
+#define PIN46_MUX_MODE_MASK     0xF
+#define PIN47_MUX_MODE_MASK     0xF
+#define PIN48_MUX_MODE_MASK     0xF
+#define PIN49_MUX_MODE_MASK     0xF
+#define PIN50_MUX_MODE_MASK     0xF
+#define PIN51_MUX_MODE_MASK     0xF
+#define PIN52_MUX_MODE_MASK     0xF
+#define PIN53_MUX_MODE_MASK     0xF
+#define PIN54_MUX_MODE_MASK     0xF
+
+
+/********************************************************************************************************************************/
 /*                                                        PIN_PAD                                                               */
 /********************************************************************************************************************************/
 
@@ -303,8 +364,15 @@ extern "C" {
 #define PIN53_PAD       kIOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_25
 #define PIN54_PAD       kIOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_29
 
-// Belki lazim olursa pinMode() fonksiyonu yazilabilir.
-// void pinMode(GPIO_Type* PIN_GPIO, uint8_t PIN_MUX, uint8_t PIN_PAD, uint8_t PIN_MASK, uint8_t mode);
+typedef struct {
+    uint8_t bit;
+    uint8_t mux;
+    uint8_t pad;
+    uint8_t mux_mask;
+    GPIO_Type* gpio;
+}Pins;
+
+extern Pins Teensy_Pins[55];
 
 #ifdef __cplusplus
 }

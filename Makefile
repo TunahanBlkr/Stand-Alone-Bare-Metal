@@ -16,7 +16,7 @@ CXXFLAGS	= $(CFLAGS) -fno-exceptions -fno-rtti
 LDFLAGS		= $(MCU) -Wl,--gc-sections,--no-warn-rwx-segments --specs=nosys.specs -Timxrt1062.ld
 
 INCLUDES	= $(addprefix -I, $(INC_DIRS))
-LIBS		= -L$(LIB_DIR) -lfreertos
+LIBS		= -L$(LIB_DIR) -lfreertos -lm
 
 C_SOURCES	= $(wildcard $(SRC_DIR)/*.c)
 CPP_SOURCES	= $(wildcard $(SRC_DIR)/*.cpp)

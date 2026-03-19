@@ -5,7 +5,7 @@
     .align 2
     .globl __vectors
 __vectors:
-    .long   _vStackTop                                      /* Top of Stack */
+    .long   0x20020000                                      /* 128K DTCM for boot, ResetHandler configures stack for 256KB DTCM*/
     .long   Reset_Handler                                   /* Reset Handler */
     .long   NMI_Handler                                     /* NMI Handler*/
     .long   HardFault_Handler                               /* Hard Fault Handler*/

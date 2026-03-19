@@ -1,8 +1,8 @@
 MEMORY
 {
-    ITCM (rwx):  ORIGIN = 0x00000000, LENGTH = 128K
-	DTCM (rwx):  ORIGIN = 0x20000000, LENGTH = 128K
-	RAM (rwx):   ORIGIN = 0x20200000, LENGTH = 256K
+    ITCM (rwx):  ORIGIN = 0x00000000, LENGTH = 512K
+	DTCM (rwx):  ORIGIN = 0x20000000, LENGTH = 512K
+	OCRAM (rwx): ORIGIN = 0x20200000, LENGTH = 512K
 	FLASH (rwx): ORIGIN = 0x60000000, LENGTH = 7936K
 }
 
@@ -30,28 +30,11 @@ SECTIONS
         __vectors_start__ = ABSOLUTE(.) ;
         KEEP(*(.isr_vector))
         . = ALIGN(4) ;
-
-        __section_table_start = .;
-        __data_section_table = .;
-        LONG(LOADADDR(.text.itcm));
-        LONG(    ADDR(.text.itcm));
-        LONG(  SIZEOF(.text.itcm));
-        LONG(LOADADDR(.data));
-        LONG(    ADDR(.data));
-        LONG(  SIZEOF(.data));
-        __data_section_table_end = .;
-        __bss_section_table = .;
-        LONG(    ADDR(.bss));
-        LONG(  SIZEOF(.bss));
-        __bss_section_table_end = .;
-        __section_table_end = . ;
-
         *(.startup)
-
-       *(.text*)
-       /* FreeRTOS Debug Config unutma */
-       *(.rodata .rodata.* .constdata .constdata.*)
-       . = ALIGN(4);
+        *(.text*)
+        /* FreeRTOS Debug Config unutma */
+        *(.rodata .rodata.* .constdata .constdata.*)
+        . = ALIGN(4);
     } > FLASH
 
     .preinit_array : ALIGN(4)
@@ -68,22 +51,26 @@ SECTIONS
         __init_array_end = .;
     } > FLASH
 
+    .ARM.extab : ALIGN(4)
+    {
+        *(.ARM.extab* .gnu.linkonce.armextab.*)
+    } > FLASH
+
+    .ARM.exidx : ALIGN(4)
+    {
+        __exidx_start = .;
+        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+        __exidx_end = .;
+    } > FLASH
+
     .text.itcm : ALIGN(4)
     {
         FILL(0xff)
-        __itcm_start__ = . ;
+        __ram_func_start__ = . ;
         *(.ramfunc*)
         . = ALIGN(32) ;
-        __itcm_end__ = . ;
+        __ram_func_end__ = . ;
      } > ITCM AT>FLASH
-
-    .uninit_RESERVED (NOLOAD) : ALIGN(4)
-    {
-        _start_uninit_RESERVED = .;
-        KEEP(*(.bss.$RESERVED*))
-       . = ALIGN(4) ;
-        _end_uninit_RESERVED = .;
-    } > DTCM AT> DTCM
 
     .data : ALIGN(4)
     {
@@ -97,11 +84,9 @@ SECTIONS
 
     .bss : ALIGN(4)
     {
-        __bss_start__ = .;
         *(.bss*)
         *(COMMON)
         . = ALIGN(4) ;
-        __bss_end__ = .;
     } > DTCM AT> DTCM
 
     .noinit (NOLOAD): ALIGN(4)
@@ -112,39 +97,36 @@ SECTIONS
         __noinit_end__ = .;
     } > DTCM AT> DTCM
 
-    .ARM.extab : ALIGN(4)
+    DMA_MAX_SIZE = 0x1000;
+    .noncacheable_region (NOLOAD) :
     {
-        *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > FLASH
+        . = ALIGN(DMA_MAX_SIZE);
+        __dma_buffer_start__ = .;
+        *(.dma_buffer*)
+        . = ALIGN(32);
+        __dma_buffer_end__ = .;
+    } > OCRAM AT> OCRAM
 
-    .ARM.exidx : ALIGN(4)
-    {
-        __exidx_start = .;
-        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-        __exidx_end = .;
-    } > FLASH
+    __itcm_start__ = ADDR(.text.itcm);
+    __itcm_end__   = ADDR(.text.itcm) + SIZEOF(.text.itcm);
+    __itcm_load__  = LOADADDR(.text.itcm);
 
-    _HeapSize = 0x3000;
-    .heap :  ALIGN(4)
-    {
-        _pvHeapStart = .;
-        . += _HeapSize;
-        . = ALIGN(4);
-        _pvHeapLimit = .;
-    } > DTCM
+    __dtcm_start__ = ADDR(.data);
+    __dtcm_end__   = ADDR(.data) + SIZEOF(.data);
+    __dtcm_load__  = LOADADDR(.data);
 
-     _StackSize = 0x2000;
-    .heap2stackfill  :
-    {
-        . += _StackSize;
-    } > DTCM
+    __bss_start__  = ADDR(.bss);
+    __bss_end__    = ADDR(.bss) + SIZEOF(.bss);
 
-    .stack ORIGIN(DTCM) + LENGTH(DTCM) - _StackSize - 0:  ALIGN(4)
-    {
-        _vStackBase = .;
-        . = ALIGN(4);
-        _vStackTop = . + _StackSize;
-    } > DTCM
+    _pvHeapStart   = ORIGIN(OCRAM) + DMA_MAX_SIZE + 0x1000;
+    _pvHeapLimit   = ORIGIN(OCRAM) + LENGTH(OCRAM);
+
+    __dma_buffer_size__ = __dma_buffer_end__ - __dma_buffer_start__;
+
+    __itcm_block_count__    = (SIZEOF(.text.itcm) + 0x7FFF) >> 15;
+    __flexram_bank_config__ = 0xAAAAAAAA | ((1 << (__itcm_block_count__ * 2)) - 1);
+
+    _vStackTop = ORIGIN(DTCM) + ((16 - __itcm_block_count__) << 15);
 	
 	_teensy_model_identifier = 0x25;
 
@@ -154,4 +136,6 @@ SECTIONS
 	.debug_frame    0 : { *(.debug_frame) }
 	.debug_str      0 : { *(.debug_str) }
 	.debug_loc      0 : { *(.debug_loc) }
+
+    ASSERT(__dma_buffer_size__ <= DMA_MAX_SIZE, "error: dma_buffer is too big")
 }

@@ -1,7 +1,11 @@
 #include "MIMXRT1062.h"
-#include "Teensy_Pins.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "Teensy_Pins.h"
+#include "Teensy_Digital.h"
+#include "Teensy_PWM.h"
+#include "Teensy_Motor_Controller.h"
+
 
 static void vBlink13Task(void *pvParameters)
 {
@@ -9,19 +13,8 @@ static void vBlink13Task(void *pvParameters)
 
     while (1)
     {
-        PIN13_GPIO->DR_TOGGLE = PIN13_BITMASK;
+        //digitalWrite(13, HIGH);
         vTaskDelay(pdMS_TO_TICKS(500));
-    }
-}
-
-static void vBlink9Task(void *pvParameters)
-{
-    (void)pvParameters;
-
-    while (1)
-    {
-        PIN9_GPIO->DR_TOGGLE = PIN9_BITMASK;
-        vTaskDelay(pdMS_TO_TICKS(200));
     }
 }
 
@@ -29,14 +22,12 @@ int main(void) {
 
     CCM->CCGR0 |= CCM_CCGR0_CG15_MASK;
 
-    IOMUXC->SW_MUX_CTL_PAD[PIN13_MUX] = ( IOMUXC->SW_MUX_CTL_PAD[PIN13_MUX] & ~0xF ) | 0x5;
-    IOMUXC->SW_MUX_CTL_PAD[PIN9_MUX] = ( IOMUXC->SW_MUX_CTL_PAD[PIN9_MUX] & ~0xF ) | 0x5;
+    pinMode(13, OUTPUT);
 
-    PIN13_GPIO->GDIR |= PIN13_BITMASK;
-    PIN9_GPIO->GDIR |= PIN9_BITMASK;
-
-    xTaskCreate( vBlink13Task, "LED13", 256, NULL, tskIDLE_PRIORITY + 1, NULL );
-    xTaskCreate( vBlink9Task, "LED9", 256, NULL, tskIDLE_PRIORITY + 1, NULL );
+    xTaskCreate( vBlink13Task, "LED13", 256, NULL, 2, NULL );
+    xTaskCreate( MotorHandler, "Motor_H", 512, NULL, configMAX_PRIORITIES - 2, NULL);
+    xTaskCreate( Motor1_DataRead, "M1_DR", 512, NULL, configMAX_PRIORITIES - 1, &Motor1_DataRead_TaskToken);
+    xTaskCreate( Motor2_DataRead, "M2_DR", 512, NULL, configMAX_PRIORITIES - 1, &Motor2_DataRead_TaskToken);
 
     vTaskStartScheduler();
 
