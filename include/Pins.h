@@ -1,5 +1,5 @@
-#ifndef TEENSY_PINS_H
-#define TEENSY_PINS_H
+#ifndef PINS_H
+#define PINS_H
 
 #ifdef __cplusplus
 extern "C" {

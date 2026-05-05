@@ -1,5 +1,5 @@
-#ifndef PID_CONTROLLER_H
-#define PID_CONTROLLER_H
+#ifndef PID_H
+#define PID_H
 
 #ifdef __cplusplus
 extern "C" {

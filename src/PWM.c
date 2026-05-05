@@ -1,4 +1,4 @@
-#include "Teensy_PWM.h"
+#include "PWM.h"
 
 #define M(a, b) ((((a) - 1) << 2) | (b))
 
@@ -87,15 +87,40 @@ void analogWrite(uint8_t pin, uint16_t val) {
 	flexpwm->MCTRL |= PWM_MCTRL_CLDOK(mask);
 	switch (p->channel) {
 	case 0: // X
+		// Her zaman right aligned
 		flexpwm->SM[submodule].VAL0 = modulo - cval;
 		flexpwm->OUTEN |= PWM_OUTEN_PWMX_EN(mask);
 		break;
 	case 1: // A
-		flexpwm->SM[submodule].VAL2 = modulo - cval;
+		switch(PWM_ALIGN_TYPE) {
+		case LEFT_ALIGNED:
+			flexpwm->SM[submodule].VAL2 =  0;
+			flexpwm->SM[submodule].VAL3 =  cval;
+			break;
+		case CENTER:
+			flexpwm->SM[submodule].VAL2 = -cval;
+			flexpwm->SM[submodule].VAL3 =  cval;
+			break;
+		case RIGHT_ALIGNED:
+			flexpwm->SM[submodule].VAL2 =  modulo - cval;
+			flexpwm->SM[submodule].VAL3 =  modulo;
+		}
 		flexpwm->OUTEN |= PWM_OUTEN_PWMA_EN(mask);
 		break;
 	case 2: // B
-		flexpwm->SM[submodule].VAL4 = modulo - cval;
+		switch(PWM_ALIGN_TYPE) {
+		case LEFT_ALIGNED:
+			flexpwm->SM[submodule].VAL4 =  0;
+			flexpwm->SM[submodule].VAL5 =  cval;
+			break;
+		case CENTER:
+			flexpwm->SM[submodule].VAL4 = -cval;
+			flexpwm->SM[submodule].VAL5 =  cval;
+			break;
+		case RIGHT_ALIGNED:
+			flexpwm->SM[submodule].VAL4 =  modulo - cval;
+			flexpwm->SM[submodule].VAL5 =  modulo;
+		}
 		flexpwm->OUTEN |= PWM_OUTEN_PWMB_EN(mask);
 	}
 	flexpwm->MCTRL |= PWM_MCTRL_LDOK(mask);
@@ -106,8 +131,28 @@ void analogWrite(uint8_t pin, uint16_t val) {
 	//Pad ayarlarini yap
 }
 
-void flexpwm_init(PWM_Type* pwm) {
+static uint16_t find_pwm_period(uint32_t clock, uint32_t frequency){
+	if(frequency == 0) return 0;
 
+	uint32_t divider = clock / frequency;
+	uint16_t prescaler = 0;
+
+	while((divider >> prescaler) >= 65535) {
+		prescaler++;
+	}
+
+	return divider >> prescaler;
+};
+
+static void flexpwm_init(PWM_Type* pwm) {
+	uint32_t period = find_pwm_period(PWM_CLK_HZ, PWM_FREQUENCY);
+	uint16_t prescaler = 0;
+
+	if(!period) {/*Hata*/};
+
+	while((period << prescaler) < (PWM_CLK_HZ/PWM_FREQUENCY))
+		prescaler++;
+	
 	pwm->FCTRL  = PWM_FCTRL_FLVL(15);
 	pwm->FSTS   = PWM_FSTS_FFLAG(15);
 
@@ -115,17 +160,38 @@ void flexpwm_init(PWM_Type* pwm) {
 
 	for(int i= 0; i<4; i++) {
 		pwm->SM[i].CTRL2     =  PWM_CTRL2_INDEP_MASK;
-		pwm->SM[i].CTRL      =  PWM_CTRL_FULL_MASK;
+		pwm->SM[i].CTRL      =  PWM_CTRL_FULL_MASK | PWM_CTRL_PRSC(prescaler);
 		pwm->SM[i].OCTRL     =  0;
 		pwm->SM[i].DTCNT0    =  0;
 		pwm->SM[i].DTCNT1    =  0;
-		pwm->SM[i].INIT      =  0;
-		pwm->SM[i].VAL0      =  2750;
-		pwm->SM[i].VAL1      =  2750;
-		pwm->SM[i].VAL2      =  2750;
-		pwm->SM[i].VAL3      =  2750;
-		pwm->SM[i].VAL4      =  2750;
-		pwm->SM[i].VAL5      =  2750;
+		switch(PWM_ALIGN_TYPE) {
+		case LEFT_ALIGNED:
+			pwm->SM[i].INIT  =  0;
+			pwm->SM[i].VAL0  =  period;
+			pwm->SM[i].VAL1  =  period;
+			pwm->SM[i].VAL2  =  0;
+			pwm->SM[i].VAL3  =  0;
+			pwm->SM[i].VAL4  =  0;
+			pwm->SM[i].VAL5  =  0;
+			break;
+		case CENTER:
+			pwm->SM[i].INIT  = -period/2;
+			pwm->SM[i].VAL0  =  period/2;
+			pwm->SM[i].VAL1  =  period/2;
+			pwm->SM[i].VAL2  =  0;
+			pwm->SM[i].VAL3  =  0;
+			pwm->SM[i].VAL4  =  0;
+			pwm->SM[i].VAL5  =  0;
+			break;
+		case RIGHT_ALIGNED:
+			pwm->SM[i].INIT  =  0;
+			pwm->SM[i].VAL0  =  period;
+			pwm->SM[i].VAL1  =  period;
+			pwm->SM[i].VAL2  =  period;
+			pwm->SM[i].VAL3  =  period;
+			pwm->SM[i].VAL4  =  period;
+			pwm->SM[i].VAL5  =  period;
+		}
 	}
 
 	pwm->MCTRL |= PWM_MCTRL_LDOK(15);

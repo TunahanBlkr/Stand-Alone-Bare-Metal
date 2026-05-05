@@ -1,18 +1,14 @@
-#ifndef TEENSY_PWM_H
-#define TEENSY_PWM_H
+#ifndef PWM_H
+#define PWM_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "MIMXRT1062.h"
-#include "Teensy_Pins.h"
+#include "Pins.h"
 #include "FreeRTOS.h"
 #include "task.h"
-
-void analogWrite(uint8_t pin, uint16_t val);
-void flexpwm_init(PWM_Type* pwm);
-void pwm_init(void);
 
 typedef struct {
 	uint8_t type;    // 0=no pwm, 1=flexpwm, 2=quad
@@ -21,7 +17,19 @@ typedef struct {
 	uint8_t muxval;
 }pwm_info;
 
+typedef enum {
+	LEFT_ALIGNED,
+	CENTER,
+	RIGHT_ALIGNED
+} PWM_Align;
+
+void analogWrite(uint8_t pin, uint16_t val);
+void pwm_init(void);
 extern pwm_info pwm_pin[55];
+
+#define PWM_CLK_HZ CCM_IPG_CLK_HZ
+#define PWM_FREQUENCY 8000
+#define PWM_ALIGN_TYPE CENTER
 
 #ifdef __cplusplus
 }
